@@ -1,5 +1,11 @@
-flask==3.0.3
-pandas==2.2.2
-numpy==1.26.4
-scikit-learn==1.5.1
-openpyxl==3.1.4
+# Change this (line 4 in your ml_engine.py):
+from sklearn.ensemble import RandomForestRegressor
+
+# To this:
+try:
+    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import mean_absolute_error
+    HAS_SK = True
+except ImportError:
+    HAS_SK = False

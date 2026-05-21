@@ -2,7 +2,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import hashlib, io, re
+import hashlib, io, re, json
 from datetime import datetime, timedelta
 
 # ── optional ML imports ──────────────────────────────────────────────────────
@@ -34,6 +34,9 @@ def _add_notif(user_id: str, ntype: str, message: str):
         "created_at": datetime.utcnow()
     }
 
+def unread_notif_count(user_id: str) -> int:
+    return sum(1 for n in _DB["notifs"].values() if n["user_id"] == user_id and not n["read"])
+
 # ═════════════════════════════════════════════════════════════════════════════
 #  ML Forecast engine
 # ═════════════════════════════════════════════════════════════════════════════
@@ -45,12 +48,9 @@ def _detect_cols(df: pd.DataFrame):
     cols = list(df.columns)
     date_col = part_col = qty_col = None
     for c in cols:
-        if _DATE_HINTS.search(c) and date_col is None:
-            date_col = c
-        elif _PART_HINTS.search(c) and part_col is None:
-            part_col = c
-        elif _QTY_HINTS.search(c) and qty_col is None:
-            qty_col = c
+        if _DATE_HINTS.search(c) and date_col is None: date_col = c
+        elif _PART_HINTS.search(c) and part_col is None: part_col = c
+        elif _QTY_HINTS.search(c) and qty_col is None: qty_col = c
     if date_col is None: date_col = cols[0]
     if qty_col is None:
         num_cols = df.select_dtypes(include="number").columns.tolist()
@@ -175,11 +175,4 @@ elif page == "Signup":
     with st.form("signup_form"):
         name = st.text_input("Name")
         email = st.text_input("Email")
-        company = st.text_input("Company")
-        pw = st.text_input("Password", type="password")
-        confirm = st.text_input("Confirm Password", type="password")
-        if st.form_submit_button("Create Account"):
-            if not name or not email or not pw:
-                st.error("Please fill all required fields.")
-            elif pw != confirm:
-                st
+        company = st.text

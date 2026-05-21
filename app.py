@@ -9,7 +9,7 @@ from functools import wraps
 
 from flask import (
     Flask, render_template, request, redirect, url_for,
-    session, flash, jsonify, g
+    session, flash, jsonify, g, send_from_directory
 )
 import pandas as pd
 import numpy as np
@@ -38,6 +38,9 @@ app = Flask(
     static_folder="static",
     template_folder="templates"
 )
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024   # 32 MB
 

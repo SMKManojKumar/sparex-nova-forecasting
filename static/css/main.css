@@ -1,3 +1,7 @@
+body{
+    background:white !important;
+    color:black !important;
+}
 /* SPREX NOVA v3 — Logo edition, blue phoenix theme */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 

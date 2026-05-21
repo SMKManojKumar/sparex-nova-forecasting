@@ -1,6 +1,10 @@
-{% extends "base.html" %}
-{% block title %}Sign In — SPREX NOVA{% endblock %}
-{% block body %}
+<!DOCTYPE html>
+<html>
+<head>
+<title>SPREX NOVA LOGIN</title>
+</head>
+
+<body>
 <div class="auth-pg">
   <div class="blob" style="width:500px;height:500px;top:-180px;right:-180px;opacity:.08"></div>
   <div class="blob" style="width:300px;height:300px;bottom:-100px;left:-100px;opacity:.05"></div>
@@ -42,4 +46,6 @@
     <div class="auth-foot">Don't have an account? <a href="{{ url_for('signup') }}" style="font-weight:600">Create one free</a></div>
   </div>
 </div>
-{% endblock %}
+
+</body>
+</html>

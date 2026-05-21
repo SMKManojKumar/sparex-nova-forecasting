@@ -33,7 +33,11 @@ except ImportError:
 # ═════════════════════════════════════════════════════════════════════════════
 #  App factory
 # ═════════════════════════════════════════════════════════════════════════════
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_folder="static",
+    template_folder="templates"
+)
 app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024   # 32 MB
 

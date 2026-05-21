@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}Forecast Results{% endblock %}
+{% block page_title %}Forecast Results{% endblock %}
+{% block content %}
+<div class="ph"><h1>Forecast Results</h1><p>All your completed forecast jobs.</p></div>
+
+<div class="card">
+{% if recs %}
+<div class="tw">
+  <table>
+    <thead><tr><th>Dataset</th><th>Parts Forecasted</th><th>Date</th><th></th></tr></thead>
+    <tbody>
+    {% for r in recs %}
+    <tr>
+      <td style="font-weight:600">{{ r.filename }}</td>
+      <td><span class="chip c-purple">{{ r.parts_count }} part{{ 's' if r.parts_count!=1 }}</span></td>
+      <td style="font-size:12.5px;color:var(--muted)">{{ r.uploaded_at.strftime('%b %d, %Y %H:%M') }}</td>
+      <td><a href="{{ url_for('results', uid=r.id) }}" class="btn btn-p btn-sm">View →</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty">
+  <div class="empty-ico">📊</div>
+  <div class="empty-t">No results yet</div>
+  <p style="font-size:13px">Upload a dataset to generate your first forecast.</p>
+  <a href="{{ url_for('upload') }}" class="btn btn-p btn-sm" style="margin-top:14px">Upload Dataset →</a>
+</div>
+{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Sign In — SPREX NOVA{% endblock %}
+{% block body %}
+<div class="auth-pg">
+  <div class="blob" style="width:500px;height:500px;top:-180px;right:-180px;opacity:.08"></div>
+  <div class="blob" style="width:300px;height:300px;bottom:-100px;left:-100px;opacity:.05"></div>
+
+  <div class="auth-box">
+    <div class="auth-logo">
+      <img src="{{ url_for('static',filename='img/logo.png') }}" class="auth-logoimg" alt="SPREX NOVA"/>
+      <div>
+        <div class="al-name">SPREX NOVA</div>
+        <div class="al-sub">Forecasting The Future of Parts</div>
+      </div>
+    </div>
+
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-sub">Sign in to continue to your dashboard</p>
+
+    <form method="POST">
+      <div class="fg">
+        <label class="fl">Email address</label>
+        <div class="finp">
+          <span class="ficon"></span>
+          <input name="email" type="email" class="fc" placeholder="you@company.com" required autocomplete="email"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" style="display:flex;justify-content:space-between">
+          Password <a href="{{ url_for('forgot_password') }}" style="font-weight:400;font-size:12px">Forgot?</a>
+        </label>
+        <div class="finp">
+          <span class="ficon"></span>
+          <input name="password" type="password" class="fc" placeholder="••••••••" required autocomplete="current-password"/>
+          <button type="button" class="peye">◎</button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-p btn-full btn-lg" style="margin-top:6px">Sign in →</button>
+    </form>
+
+    <div class="sep">or</div>
+    <div class="auth-foot">Don't have an account? <a href="{{ url_for('signup') }}" style="font-weight:600">Create one free</a></div>
+  </div>
+</div>
+{% endblock %}

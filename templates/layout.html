@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="layout">
+  <div class="sb-overlay"></div>
+
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <img src="{{ url_for('static',filename='img/logo.png') }}" class="sb-logoimg" alt="SPREX NOVA"/>
+      <div>
+        <div class="sb-brand">SPREX NOVA</div>
+        <div class="sb-sub">Forecasting the future of parts</div>
+      </div>
+    </div>
+
+    <div class="sb-nav">
+      <div class="sb-sec">Main</div>
+      <a href="{{ url_for('dashboard') }}" class="sb-a {% if request.endpoint=='dashboard' %}on{% endif %}">
+        <span class="sb-ico"></span> Dashboard
+      </a>
+      <a href="{{ url_for('upload') }}" class="sb-a {% if request.endpoint=='upload' %}on{% endif %}">
+        <span class="sb-ico"></span> Upload Data
+      </a>
+      <a href="{{ url_for('results_list') }}" class="sb-a {% if request.endpoint in ['results_list','results'] %}on{% endif %}">
+        <span class="sb-ico"></span> Forecast Results
+      </a>
+
+      <div class="sb-sec">Account</div>
+      <a href="{{ url_for('notifications') }}" class="sb-a {% if request.endpoint=='notifications' %}on{% endif %}">
+        <span class="sb-ico"></span> Notifications
+        {% if nc > 0 %}<span class="sb-badge">{{ nc }}</span>{% endif %}
+      </a>
+      <a href="{{ url_for('profile') }}" class="sb-a {% if request.endpoint=='profile' %}on{% endif %}">
+        <span class="sb-ico"></span> Profile
+      </a>
+      <a href="{{ url_for('about') }}" class="sb-a {% if request.endpoint=='about' %}on{% endif %}">
+        <span class="sb-ico"></span><b>About</b>
+      </a>
+
+      <div class="sb-sec">Session</div>
+      <a href="{{ url_for('logout') }}" class="sb-a" style="color:var(--red)">
+        <span class="sb-ico"></span> <b>Logout</b>
+      </a>
+    </div>
+
+    <div class="sb-foot">
+      {% if cu %}
+      <a href="{{ url_for('profile') }}" class="sb-user">
+        <div class="av" style="background:{{ cu.avatar_color }}">{{ cu.name[0].upper() }}</div>
+        <div>
+          <div class="sb-uname">{{ cu.name }}</div>
+          <div class="sb-uemail">{{ cu.email }}</div>
+        </div>
+      </a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="ham">☰</button>
+      <a href="{{ url_for('dashboard') }}" class="tb-logo">
+        <img src="{{ url_for('static',filename='img/logo.png') }}" class="tb-logoimg" alt="logo"/>
+        <span class="tb-title">{% block page_title %}{% endblock %}</span>
+      </a>
+      <div class="spacer"></div>
+
+      <div class="theme-row">
+        <button class="th-btn" data-t="light"> Light</button>
+        <button class="th-btn" data-t="dark"> Dark</button>
+        <button class="th-btn" data-t="neon">Neon</button>
+      </div>
+
+      <a href="{{ url_for('notifications') }}" class="tb-btn" style="text-decoration:none;color:inherit;">
+        🔔<span class="nb" id="nbadge" {% if nc==0 %}style="display:none"{% endif %}>{{ nc }}</span>
+      </a>
+      {% if cu %}
+      <a href="{{ url_for('profile') }}" class="tb-btn" style="text-decoration:none;">
+        <div class="av" style="background:{{ cu.avatar_color }};width:26px;height:26px;font-size:10px;">{{ cu.name[0].upper() }}</div>
+      </a>
+      {% endif %}
+    </header>
+
+    <main class="page">{% block content %}{% endblock %}</main>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — SPREX NOVA{% endblock %}
+{% block body %}
+<div class="auth-pg">
+  <div class="blob" style="width:450px;height:450px;top:-150px;left:-150px;opacity:.08"></div>
+  <div class="blob" style="width:280px;height:280px;bottom:-80px;right:-80px;opacity:.05"></div>
+
+  <div class="auth-box" style="max-width:450px">
+    <div class="auth-logo">
+      <img src="{{ url_for('static',filename='img/logo.png') }}" class="auth-logoimg" alt="SPREX NOVA"/>
+      <div>
+        <div class="al-name">SPREX NOVA</div>
+        <div class="al-sub">Create your account</div>
+      </div>
+    </div>
+
+    <h1 class="auth-title">Get started</h1>
+    <p class="auth-sub">Free forever — no credit card needed</p>
+
+    <form method="POST">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="fg"><label class="fl">Full name *</label><input name="name" type="text" class="fc" placeholder="Jane Smith" required/></div>
+        <div class="fg"><label class="fl">Company</label><input name="company" type="text" class="fc" placeholder="ACME Corp"/></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Email *</label>
+        <div class="finp"><span class="ficon"></span><input name="email" type="email" class="fc" placeholder="you@company.com" required/></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Password *</label>
+        <div class="finp"><span class="ficon"></span><input name="password" type="password" class="fc" placeholder="Min 6 characters" required/><button type="button" class="peye">◎</button></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Confirm password *</label>
+        <div class="finp"><span class="ficon"></span><input name="confirm" type="password" class="fc" placeholder="Repeat password" required/><button type="button" class="peye">◎</button></div>
+      </div>
+      <button type="submit" class="btn btn-p btn-full btn-lg" style="margin-top:4px">Create account →</button>
+    </form>
+
+    <div class="auth-foot" style="margin-top:16px">Already have an account? <a href="{{ url_for('login') }}" style="font-weight:600">Sign in</a></div>
+  </div>
+</div>
+{% endblock %}

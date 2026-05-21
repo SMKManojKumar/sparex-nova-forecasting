@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+
+<div class="ph">
+  <h1><b>Welcome</b>   , <i>{{ cu.name.split()[0] }}</i></h1>
+  <p>Here's your forecasting overview.</p>
+</div>
+
+<div class="stats">
+  <div class="sc">
+    <div class="sc-ico" style="background:var(--asoft);color:var(--accent)"></div>
+    <div><div class="sc-val" data-num="{{ total }}">0</div><div class="sc-lbl">Total Uploads</div></div>
+  </div>
+  <div class="sc">
+    <div class="sc-ico" style="background:rgba(22,163,74,.1);color:var(--green)"></div>
+    <div><div class="sc-val" data-num="{{ succ }}">0</div><div class="sc-lbl">Successful</div></div>
+  </div>
+  <div class="sc">
+    <div class="sc-ico" style="background:rgba(2,132,199,.1);color:var(--sky)"></div>
+    <div><div class="sc-val" data-num="{{ total_parts }}">0</div><div class="sc-lbl">Parts Analysed</div></div>
+  </div>
+  <div class="sc">
+    <div class="sc-ico" style="background:rgba(217,119,6,.1);color:var(--amber)"></div>
+    <div><div class="sc-val">ML</div><div class="sc-lbl">Powered Engine</div></div>
+  </div>
+</div>
+
+<div class="g2" style="margin-bottom:20px">
+  <div class="cta-card">
+    <div style="font-size:2rem;margin-bottom:10px">⚡</div>
+    <h3 style="font-family:'Outfit',sans-serif;font-size:1.1rem;margin-bottom:6px">Run a New Forecast</h3>
+    <p style="font-size:13px;margin-bottom:16px;opacity:.85">Upload any spare parts CSV or Excel file and get AI-powered demand forecasts in seconds.</p>
+    <a href="{{ url_for('upload') }}" class="btn btn-ghost" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3)">Upload Dataset →</a>
+  </div>
+  <div class="card">
+    <div style="font-size:2rem;margin-bottom:10px">📊</div>
+    <h3 style="font-family:'Outfit',sans-serif;font-size:1.05rem;margin-bottom:6px">View Results</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Browse previous forecast results, charts, and demand insights.</p>
+    <a href="{{ url_for('results_list') }}" class="btn btn-s btn-sm">Browse Forecasts →</a>
+  </div>
+</div>
+
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+    <h2 style="font-size:1rem">Recent Uploads</h2>
+    <a href="{{ url_for('upload') }}" class="btn btn-g btn-sm">+ New</a>
+  </div>
+
+  {% if recent %}
+  <div class="tw">
+    <table>
+      <thead><tr><th>File</th><th>Parts</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody>
+      {% for u in recent %}
+      <tr>
+        <td style="font-weight:600">{{ u.filename }}</td>
+        <td>{{ u.parts_count }}</td>
+        <td>
+          {% if u.status=='success' %}<span class="chip c-green">✅ Success</span>
+          {% elif u.status=='error' %}<span class="chip c-red">❌ Error</span>
+          {% else %}<span class="chip c-grey">⏳ Pending</span>{% endif %}
+        </td>
+        <td style="color:var(--muted);font-size:13px">{{ u.uploaded_at.strftime('%b %d, %Y') }}</td>
+        <td>{% if u.status=='success' %}<a href="{{ url_for('results', uid=u.id) }}" class="btn btn-p btn-sm">View</a>{% endif %}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <div class="empty-ico">📂</div>
+    <div class="empty-t">No uploads yet</div>
+    <p style="font-size:13px">Upload your first dataset to get started.</p>
+    <a href="{{ url_for('upload') }}" class="btn btn-p btn-sm" style="margin-top:14px">Upload Now</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,194 @@
+{% extends "layout.html" %}
+{% block title %}Results — {{ rec.filename }}{% endblock %}
+{% block page_title %}Forecast Results{% endblock %}
+
+{% block head %}
+<style>
+.st-high{background:rgba(220,38,38,.09);color:var(--red)}
+.st-stock{background:rgba(217,119,6,.09);color:var(--amber)}
+.st-over{background:rgba(2,132,199,.09);color:var(--sky)}
+.st-buy{background:rgba(22,163,74,.09);color:var(--green)}
+.st-stable{background:var(--asoft);color:var(--accent)}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ph" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+  <div>
+    <h1>{{ rec.filename }}</h1>
+    <p>{{ rec.parts_count }} part{{ 's' if rec.parts_count!=1 }} · {{ rec.uploaded_at.strftime('%B %d, %Y %H:%M') }}</p>
+  </div>
+  <a href="{{ url_for('results_list') }}" class="btn btn-g btn-sm">← All Results</a>
+</div>
+
+{% if data.get('error') %}
+<div class="card" style="border-color:var(--red)">
+  <div style="display:flex;gap:12px;align-items:center">
+    <span style="font-size:2rem">❌</span>
+    <div><h3 style="color:var(--red);margin-bottom:4px">Forecast Error</h3><p style="color:var(--muted)">{{ data.error }}</p></div>
+  </div>
+</div>
+
+{% else %}
+{% set parts = data.get('parts',{}) %}
+{% set warns = data.get('warnings',[]) %}
+
+{% if warns %}
+<div class="card" style="border-color:var(--amber);margin-bottom:14px">
+  <div style="display:flex;gap:10px">
+    <span>⚠️</span>
+    <div>{% for w in warns %}<p style="font-size:13px;color:var(--muted)">{{ w }}</p>{% endfor %}</div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Summary stats -->
+{% set n_high  = parts.values()|selectattr('status','equalto','High Demand Expected')|list|length %}
+{% set n_stock = parts.values()|selectattr('status','equalto','Risk of Stockout')|list|length %}
+{% set n_over  = parts.values()|selectattr('status','equalto','Overstock Risk')|list|length %}
+{% set n_buy   = parts.values()|selectattr('status','equalto','Purchase Recommended')|list|length %}
+
+<div class="stats" style="margin-bottom:20px">
+  <div class="sc"><div class="sc-ico" style="background:var(--asoft);color:var(--accent)">🔧</div><div><div class="sc-val" data-num="{{ rec.parts_count }}">0</div><div class="sc-lbl">Parts Forecasted</div></div></div>
+  <div class="sc"><div class="sc-ico" style="background:rgba(220,38,38,.1);color:var(--red)">📈</div><div><div class="sc-val" data-num="{{ n_high }}">0</div><div class="sc-lbl">High Demand</div></div></div>
+  <div class="sc"><div class="sc-ico" style="background:rgba(217,119,6,.1);color:var(--amber)">⚠️</div><div><div class="sc-val" data-num="{{ n_stock }}">0</div><div class="sc-lbl">Stockout Risk</div></div></div>
+  <div class="sc"><div class="sc-ico" style="background:rgba(22,163,74,.1);color:var(--green)">🛒</div><div><div class="sc-val" data-num="{{ n_buy }}">0</div><div class="sc-lbl">Purchase Alerts</div></div></div>
+</div>
+
+{% set plist = parts.keys()|list %}
+{% if plist %}
+<!-- Part selector pills -->
+<div class="card" style="margin-bottom:14px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+    <h2 style="font-size:.9rem;white-space:nowrap">Select Part</h2>
+    <span style="font-size:12.5px;color:var(--muted)">Click a pill to see its chart</span>
+  </div>
+  <div class="pills" id="pillRow">
+    {% for pname in plist %}
+    <button class="pill {% if loop.first %}on{% endif %}" data-part="{{ pname }}" onclick="pickPart(this,'{{ pname }}')">
+      {{ pname[:28] }}{% if pname|length>28 %}…{% endif %}
+    </button>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Chart panel -->
+<div class="card" id="chartPanel" style="margin-bottom:14px">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+    <div>
+      <h2 id="chartTitle" style="font-size:1.1rem;margin-bottom:6px">{{ plist[0] }}</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span id="chartChip" class="chip"></span>
+        <span id="chartModel" style="font-size:12px;color:var(--muted)"></span>
+        <span id="chartMAE"   style="font-size:12px;color:var(--muted)"></span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px"><span style="width:14px;height:2.5px;background:var(--accent);display:inline-block;border-radius:2px"></span>Actual</span>
+      <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px"><span style="width:14px;height:2.5px;background:var(--amber);display:inline-block;border-radius:2px"></span>Forecast</span>
+    </div>
+  </div>
+  <div class="chart-box" id="mainChart"></div>
+
+  <!-- Forecast table -->
+  <div style="margin-top:22px">
+    <h3 style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Forecast Values</h3>
+    <div class="tw">
+      <table id="fTable">
+        <thead><tr><th>Period</th><th>Forecasted Demand</th><th>Insight</th></tr></thead>
+        <tbody id="fTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Full summary table -->
+<div class="card">
+  <h2 style="font-size:.95rem;margin-bottom:16px">All Parts Summary</h2>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Part</th><th>Model</th><th>Avg Historical</th><th>Avg Forecast</th><th>MAE</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for pname,pd in parts.items() %}{% if not pd.get('error') %}
+      <tr>
+        <td style="font-weight:600">{{ pname }}</td>
+        <td style="font-size:12.5px;color:var(--muted)">{{ pd.model }}</td>
+        <td>{{ pd.avg_hist }}</td>
+        <td style="font-weight:600">{{ pd.avg_fore }}</td>
+        <td style="color:var(--muted)">{{ pd.mae }}</td>
+        <td>
+          {% set s=pd.status %}
+          {% if 'High' in s %}<span class="chip st-high">📈 {{ s }}</span>
+          {% elif 'Stockout' in s %}<span class="chip st-stock">⚠️ {{ s }}</span>
+          {% elif 'Overstock' in s %}<span class="chip st-over">📦 {{ s }}</span>
+          {% elif 'Purchase' in s %}<span class="chip st-buy">🛒 {{ s }}</span>
+          {% else %}<span class="chip st-stable">✅ {{ s }}</span>{% endif %}
+        </td>
+        <td><button class="btn btn-g btn-sm" onclick="jumpTo('{{ pname }}')">Chart</button></td>
+      </tr>
+      {% endif %}{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+const ALL = {{ data.get('parts',{})|tojson }};
+const CHIPS = {
+  'High Demand Expected': ['st-high','📈'],
+  'Risk of Stockout':     ['st-stock','⚠️'],
+  'Overstock Risk':       ['st-over','📦'],
+  'Purchase Recommended': ['st-buy','🛒'],
+  'Demand Stable':        ['st-stable','✅'],
+};
+
+function pickPart(btn, name){
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  loadPart(name);
+}
+
+function jumpTo(name){
+  const btn = [...document.querySelectorAll('.pill')].find(p=>p.dataset.part===name);
+  if(btn) pickPart(btn, name);
+  document.getElementById('chartPanel').scrollIntoView({behavior:'smooth'});
+}
+
+function loadPart(name){
+  const pd = ALL[name];
+  if(!pd || pd.error) return;
+
+  document.getElementById('chartTitle').textContent = name;
+  const [cls,ico] = CHIPS[pd.status] || ['st-stable','✅'];
+  const chip = document.getElementById('chartChip');
+  chip.className = 'chip '+cls;
+  chip.textContent = ico+' '+pd.status;
+  document.getElementById('chartModel').textContent = '🤖 '+pd.model;
+  document.getElementById('chartMAE').textContent   = 'MAE: '+pd.mae;
+
+  renderChart('mainChart', pd);
+
+  const tbody = document.getElementById('fTbody');
+  tbody.innerHTML = '';
+  (pd.fut_dates||[]).forEach((d,i)=>{
+    const v = (pd.fut_vals||[])[i] ?? '—';
+    tbody.insertAdjacentHTML('beforeend',`
+      <tr>
+        <td>${d}</td>
+        <td style="font-weight:600">${v}</td>
+        <td><span class="chip ${cls}">${ico} ${pd.status}</span></td>
+      </tr>`);
+  });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const first = Object.keys(ALL)[0];
+  if(first) loadPart(first);
+});
+</script>
+{% endblock %}

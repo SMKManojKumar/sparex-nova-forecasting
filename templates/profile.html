@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block title %}Profile{% endblock %}
+{% block page_title %}Profile{% endblock %}
+{% block content %}
+<div class="ph"><h1>My Profile</h1><p>Manage your account info and security.</p></div>
+
+<div class="g2eq">
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid var(--bdr)">
+      <div id="avprev" class="av" style="width:58px;height:58px;font-size:1.5rem;background:{{ cu.avatar_color }}">{{ cu.name[0].upper() }}</div>
+      <div>
+        <h2 style="font-size:1.1rem;margin-bottom:2px">{{ cu.name }}</h2>
+        <div style="font-size:12.5px;color:var(--muted)">{{ cu.email }}</div>
+        <div style="font-size:11.5px;color:var(--faint);margin-top:2px">Member since {{ cu.created_at.strftime('%B %Y') }}</div>
+      </div>
+    </div>
+
+    <form method="POST">
+      <input type="hidden" name="action" value="info"/>
+      <div class="fg"><label class="fl">Full name</label><input name="name" type="text" class="fc" value="{{ cu.name }}" required/></div>
+      <div class="fg"><label class="fl">Email (read-only)</label><input type="email" class="fc" value="{{ cu.email }}" disabled style="opacity:.55"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="fg"><label class="fl">Company</label><input name="company" type="text" class="fc" value="{{ cu.company or '' }}" placeholder="Your company"/></div>
+        <div class="fg"><label class="fl">Role</label><input name="role" type="text" class="fc" value="{{ cu.role or 'Analyst' }}"/></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Avatar color</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          {% for c in ['#5d5fef','#dc2626','#2563eb','#16a34a','#db2777','#d97706','#7c3aed','#0891b2'] %}
+          <label style="cursor:none">
+            <input type="radio" name="avatar_color" value="{{ c }}" {% if cu.avatar_color==c %}checked{% endif %} style="display:none" onchange="document.getElementById('avprev').style.background='{{ c }}'"/>
+            <div onclick="document.querySelectorAll('.cswatch').forEach(s=>s.style.outline='none');this.style.outline='2.5px solid var(--txt)';this.style.outlineOffset='2px';this.previousElementSibling.checked=true;document.getElementById('avprev').style.background='{{ c }}'"
+                 class="cswatch"
+                 style="width:26px;height:26px;border-radius:50%;background:{{ c }};cursor:none;transition:transform .18s;outline:{% if cu.avatar_color==c %}2.5px solid var(--txt){% else %}none{% endif %};outline-offset:2px"></div>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-p">Save changes</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:.95rem;margin-bottom:18px">🔒 Change Password</h2>
+    <form method="POST">
+      <input type="hidden" name="action" value="password"/>
+      <div class="fg">
+        <label class="fl">Current password</label>
+        <div class="finp"><input name="current" type="password" class="fc" placeholder="Your current password" required/><button type="button" class="peye">◎</button></div>
+      </div>
+      <div class="fg">
+        <label class="fl">New password</label>
+        <div class="finp"><input name="new" type="password" class="fc" placeholder="Min 6 characters" required/><button type="button" class="peye">◎</button></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Confirm new password</label>
+        <div class="finp"><input name="confirm" type="password" class="fc" placeholder="Repeat" required/><button type="button" class="peye">◎</button></div>
+      </div>
+      <button type="submit" class="btn btn-p">Update password</button>
+    </form>
+
+    <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--bdr)">
+      <h3 style="font-size:.85rem;margin-bottom:12px;color:var(--muted)">Account</h3>
+      {% for lbl,val in [('Role',cu.role or 'Analyst'),('Company',cu.company or '—'),('Joined',cu.created_at.strftime('%B %d, %Y'))] %}
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--bdr)">
+        <span style="color:var(--muted)">{{ lbl }}</span><span style="font-weight:600">{{ val }}</span>
+      </div>
+      {% endfor %}
+      <a href="{{ url_for('logout') }}" class="btn btn-g btn-full" style="margin-top:16px;color:var(--red);border-color:rgba(220,38,38,.3)">Logout</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

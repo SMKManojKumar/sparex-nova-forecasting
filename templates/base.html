@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>{% block title %}SPREX NOVA{% endblock %} — Forecasting The Future of Parts</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='css/main.css') }}"/>
+<link rel="icon" href="{{ url_for('static',filename='img/logo.png') }}" type="image/png"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js" defer></script>
+{% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- Animated background canvas -->
+<canvas id="bgCanvas"></canvas>
+
+
+
+<!-- Flash messages -->
+{% with msgs = get_flashed_messages(with_categories=true) %}{% if msgs %}
+<div class="flashes">
+{% for cat,msg in msgs %}
+<div class="fm {{ cat }}">
+  <span class="fm-ico">{% if cat=='success' %}✅{% elif cat=='error' %}❌{% elif cat=='warning' %}⚠️{% else %}ℹ️{% endif %}</span>
+  <span>{{ msg }}</span>
+  <button class="fm-x" title="close">✕</button>
+</div>
+{% endfor %}
+</div>
+{% endif %}{% endwith %}
+
+{% block body %}{% endblock %}
+
+<script src="{{ url_for('static',filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

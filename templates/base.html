@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>{% block title %}SPREX NOVA{% endblock %} — Forecasting The Future of Parts</title>
-<link rel="stylesheet" href="{{ url_for('static',filename='css/main.css') }}"/>
+<link rel="stylesheet" href="/static/css/main.css">
 <link rel="icon" href="{{ url_for('static',filename='img/logo.png') }}" type="image/png"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js" defer></script>
 {% block head %}{% endblock %}
@@ -31,7 +31,7 @@
 
 {% block body %}{% endblock %}
 
-<script src="{{ url_for('static',filename='js/main.js') }}"></script>
+<script src="/static/js/main.js"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>
